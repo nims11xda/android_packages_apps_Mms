@@ -46,7 +46,6 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.android.internal.telephony.util.BlacklistUtils;
 import com.android.mms.MmsApp;
 import com.android.mms.MmsConfig;
 import com.android.mms.R;
@@ -135,9 +134,6 @@ public class MessagingPreferenceActivity extends PreferenceActivity
     public static final String USER_AGENT               = "pref_key_mms_user_agent";
     public static final String USER_AGENT_CUSTOM        = "pref_key_mms_user_agent_custom";
 
-    // Blacklist
-    public static final String BLACKLIST                 = "pref_blacklist";
-
     // Menu entries
     private static final int MENU_RESTORE_DEFAULTS       = 1;
 
@@ -203,9 +199,6 @@ public class MessagingPreferenceActivity extends PreferenceActivity
     private CheckBoxPreference mMMSBreath;
     private Preference mTextAreaSize;
 
-    // Blacklist
-    private PreferenceScreen mBlacklist;
-
     // Whether or not we are currently enabled for SMS. This field is updated in onResume to make
     // sure we notice if the user has changed the default SMS app.
     private boolean mIsSmsEnabled;
@@ -231,9 +224,8 @@ public class MessagingPreferenceActivity extends PreferenceActivity
         }
 
         // Since the enabled notifications pref can be changed outside of this activity,
-        // we have to reload it whenever we resume, including the blacklist summary
+        // we have to reload it whenever we resume.
         setEnabledNotificationsPref();
-        updateBlacklistSummary();
         registerListeners();
         updateSmsEnabledState();
     }
@@ -280,7 +272,6 @@ public class MessagingPreferenceActivity extends PreferenceActivity
         mSignature.setEnabled(mIsSmsEnabled);
         mMMSBreath.setEnabled(mIsSmsEnabled);
         mTextAreaSize.setEnabled(mIsSmsEnabled);
-        mBlacklist.setEnabled(mIsSmsEnabled);
         mEnableEmojis.setEnabled(mIsSmsEnabled);
         mEnableQuickEmojis.setEnabled(mIsSmsEnabled);
         mSoftBankEmojis.setEnabled(mIsSmsEnabled);
@@ -290,16 +281,6 @@ public class MessagingPreferenceActivity extends PreferenceActivity
         mHideAvatar.setEnabled(mIsSmsEnabled);
         mMessageFontSize.setEnabled(mIsSmsEnabled);
         mUserAgent.setEnabled(mIsSmsEnabled);
-    }
-
-    private void updateBlacklistSummary() {
-        if (mBlacklist != null) {
-            if (BlacklistUtils.isBlacklistEnabled(this)) {
-                mBlacklist.setSummary(R.string.blacklist_summary);
-            } else {
-                mBlacklist.setSummary(R.string.blacklist_summary_disabled);
-            }
-        }
     }
 
     private void loadPrefs() {
@@ -371,9 +352,6 @@ public class MessagingPreferenceActivity extends PreferenceActivity
         mInputTypePref = (ListPreference) findPreference(INPUT_TYPE);
         mInputTypeEntries = getResources().getTextArray(R.array.pref_entries_input_type);
         mInputTypeValues = getResources().getTextArray(R.array.pref_values_input_type);
-
-        // Blacklist screen - Needed for setting summary
-        mBlacklist = (PreferenceScreen) findPreference(BLACKLIST);
 
         setMessagePreferences();
     }
